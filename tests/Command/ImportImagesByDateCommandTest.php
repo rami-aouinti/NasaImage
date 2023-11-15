@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
  * (c) Rami Aouinti <rami.aouinti@gmail.com>
@@ -8,18 +8,23 @@ namespace App\Tests\Command;
 
 use App\Command\ImportImagesByDateCommand;
 
-/**
- * Class ImportImageByDateCommandTest
- */
+
 class ImportImagesByDateCommandTest extends AbstractCommandTest
 {
-
     /**
      * @var string[]
      */
     private array $inputs = [
         'folder' => 'test_folder',
-        'date' => '2015-11-12'
+        'date' => '2015-11-12',
+    ];
+
+    /**
+     * @var string[]
+     */
+    private array $emptyInputs = [
+        'folder' => '',
+        'date' => '',
     ];
 
     protected function setUp(): void
@@ -37,25 +42,26 @@ class ImportImagesByDateCommandTest extends AbstractCommandTest
     {
         $input = $this->inputs;
         $this->executeCommand($input);
-        //$this->assertImagesCreated();
+        $this->assertImagesCreated();
     }
 
     public function testSaveImagesInteractive(): void
     {
         $this->executeCommand(
-            null,
+            $this->emptyInputs,
             array_values($this->inputs)
         );
-        //$this->assertImagesCreated();
-    }
-
-    private function assertImagesCreated(): void
-    {
-
+        $this->assertImagesCreated();
     }
 
     protected function getCommandFqcn(): string
     {
         return ImportImagesByDateCommand::class;
+    }
+
+    private function assertImagesCreated(): void
+    {
+        $filename = 'nasa-images/test_folder/2015/11/12/epic_1b_20151112010437.png';
+        $this->assertFalse(file_exists($filename));
     }
 }

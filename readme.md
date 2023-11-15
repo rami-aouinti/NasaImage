@@ -1,6 +1,18 @@
 # PHP symfony 
 Docker environment (based on official php docker hub repositories) required to run Symfony 6.
 
+To save images from Nasa Api you need to Set NASA_API_KEY in the file .env than you can use next cmd command:
+
+```bash
+php bin/console nasa:images
+```
+
+* Insert the name of the folder and the date where you want to save the images.
+* The date format must be in this format: yyyy-mm-dd (Example 2015-18-12).
+* Nb: If you do not put the date, the command will save the images taken today.
+* All images will be saved under the folder "public/folder/nasa-images/year/month/day".
+
+
 [Source code](https://github.com/rami-aouinti/NasaImage.git)
 
 ## Requirements

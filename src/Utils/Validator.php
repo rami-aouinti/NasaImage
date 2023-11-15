@@ -2,75 +2,59 @@
 
 declare(strict_types=1);
 
-/**
- * (c) Rami Aouinti <rami.aouinti@gmail.com>
- **/
-
 namespace App\Utils;
 
 use App\Helper\AvailableDatesHelper;
 use DateTime;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Exception\RuntimeException;
-use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
-use function Symfony\Component\String\u;
-
 
 /**
  * Class Validator
  */
-final class Validator
+class Validator
 {
-
-
     public function __construct(
         private AvailableDatesHelper $availableDatesHelper
-    )
-    {
-    }
-
-    public function validateFolder(?string $folder): string
-    {
-        if (empty($folder)) {
-            throw new InvalidArgumentException('The folder name can not be empty.');
-        }
-
-        if (1 !== preg_match('/^[a-z_]+$/', $folder)) {
-            throw new InvalidArgumentException(
-                'The folder name must contain only lowercase latin characters and underscores.'
-            );
-        }
-
-        return $folder;
+    ) {
     }
 
     /**
-     * @throws TransportExceptionInterface
-     * @throws ServerExceptionInterface
-     * @throws RedirectionExceptionInterface
-     * @throws DecodingExceptionInterface
-     * @throws ClientExceptionInterface
+     * @param string|null $folder
+     * @return string
+     */
+    public function validateFolder(?string $folder): string
+    {
+        if (is_null($folder)) {
+            throw new InvalidArgumentException('The folder name can not be empty.');
+        } else
+        {
+            return $folder;
+        }
+    }
+
+    /**
+     * @param string|null $date
+     * @param string $format
+     * @return string
      */
     public function validateDate(?string $date, string $format = 'Y-m-d'): string
     {
-        if(empty($date))
-        {
-            $array1 = $this->availableDatesHelper->getData();
-            $date = end($array1);
-        }
-        $d = DateTime::createFromFormat($format, $date);
-        if (empty($date)) {
+        if (is_null($date)) {
             $array = $this->availableDatesHelper->getData();
-            return end($array);
+            if (is_array($array))
+                return end($array);
+            else
+                return '2015-18-12';
+        } else
+        {
+            $dateRef = DateTime::createFromFormat($format, $date);
+            /** @phpstan-ignore-next-line */
+            if (!$dateRef && $dateRef->format($format) === $date) {
+                throw new RuntimeException(sprintf('The format of "%s" is invalid.', $date));
+            }
+
+            return $date;
         }
-
-         if (!$d && $d->format($format) === $date)
-            throw new RuntimeException(sprintf('The format of "%s" is invalid.', $date));
-
-        return $date;
     }
 }

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
  * (c) Rami Aouinti <rami.aouinti@gmail.com>
@@ -16,16 +16,19 @@ final class ValidatorTest extends TestCase
 
     private string $lastDay;
 
-
     protected function setUp(): void
     {
         $service = $this->getMockBuilder(AvailableDatesHelper::class)
             ->disableOriginalConstructor()
             ->getMock();
         $this->validator = new Validator($service);
-        $availableDates = $service->getData();
-        print_r($availableDates);
-        $this->lastDay = end($availableDates);
+        $availableDates = $this->availableDate();
+        if ($availableDates) {
+            $this->lastDay = end($availableDates);
+        }
+        else {
+            $this->lastDay = '2015-18-12';
+        }
     }
 
     public function testValidateFolder(): void
@@ -51,7 +54,7 @@ final class ValidatorTest extends TestCase
 
     public function testValidateDate(): void
     {
-        $test = 'date';
+        $test = '2023-05-12';
 
         $this->assertSame($test, $this->validator->validateDate($test));
     }
@@ -68,4 +71,17 @@ final class ValidatorTest extends TestCase
         $this->validator->validateDate('invalid data');
     }
 
+
+    /**
+     * @return string[]
+     */
+    private function availableDate(): array
+    {
+        return [
+            "2023-11-10",
+            "2023-11-11",
+            "2023-11-12",
+            "2023-11-13"
+        ];
+    }
 }

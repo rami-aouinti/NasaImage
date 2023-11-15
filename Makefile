@@ -145,7 +145,7 @@ phpcs: ## Runs PHP CodeSniffer
 	@make exec-bash cmd="./vendor/bin/phpcs --version && ./vendor/bin/phpcs --standard=PSR12 --colors -p src tests"
 
 phpcbf: ## Runs PHP CodeSniffer
-	@make exec-bash cmd="./vendor/bin/phpcbf --version && ./vendor/bin/phpcbf"
+	@make exec-bash cmd="./vendor/bin/phpcbf --version && ./vendor/bin/phpcbf  --standard=PSR12 --colors -p src tests"
 
 
 ecs: ## Runs Easy Coding Standard tool

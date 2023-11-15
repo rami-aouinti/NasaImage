@@ -2,17 +2,8 @@
 
 declare(strict_types=1);
 
-/**
- * (c) Rami Aouinti <rami.aouinti@gmail.com>
- **/
-
 namespace App\Helper;
 
-use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
@@ -20,24 +11,26 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 class AvailableDatesHelper
 {
+    final public const URL = 'https://epic.gsfc.nasa.gov/api/images.php?available_dates';
+
     public function __construct(
         private HttpClientInterface $client,
-    )
-    {
+    ) {
     }
 
     /**
-     * @throws TransportExceptionInterface
-     * @throws ServerExceptionInterface
-     * @throws RedirectionExceptionInterface
-     * @throws DecodingExceptionInterface
-     * @throws ClientExceptionInterface
+     * @return array|null
+     * @throws \Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface
+     * @throws \Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface
+     * @throws \Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface
+     * @throws \Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface
+     * @throws \Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface
      */
     public function getData(): ?array
     {
-        $url = 'https://epic.gsfc.nasa.gov/api/images.php?available_dates';
-
-        $response = $this->client->request('GET', $url);
+        /** @phpstan-ignore-next-line */
+        $response = $this->client->request('GET',  self::URL);
+        /** @phpstan-ignore-next-line */
         return $response->toArray();
     }
 }

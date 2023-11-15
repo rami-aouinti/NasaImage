@@ -2,13 +2,12 @@
 
 declare(strict_types=1);
 
-/**
- * (c) Rami Aouinti <rami.aouinti@gmail.com>
- **/
-
 namespace App\Service;
 
 use DateTime;
+use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Filesystem\Path;
 
 /**
  * Class ImageUploader
@@ -21,25 +20,54 @@ class ImageUploader
     ) {
     }
 
-    public function uploadFromUrlToFolder(string $imageName,string $folder, ?string $date)
+    /**
+     * @throws \Exception
+     */
+    public function uploadFromUrlToFolder(string $folder, string $date): void
     {
         $datetime = DateTime::createFromFormat('Y-m-d', $date);
-        $month = $datetime->format('m');
-        $day = $datetime->format('d');
-        $year = $datetime->format('y');
+        if ($datetime) {
+            $month = $datetime->format('m');
+            $day = $datetime->format('d');
+            $year = $datetime->format('Y');
+            $uploadPath = $this->targetDirectory . '/' . $folder . '/' . $year . '/' . $month . '/' . $day;
 
-        $images = "https://api.nasa.gov/EPIC/api/natural/date/{$year}-{$month}-{$day}?api_key={$this->nasaApiKey}Y";
-        $meta = file_get_contents($images);
-        $arr = json_decode($meta);
+            $filesystem = new Filesystem();
 
-        foreach($arr as $item) {
-            $name = $item->image . '.png';
-            $archive = "https://epic.gsfc.nasa.gov/archive/natural/{$year}/{$month}/{$day}/png/";
+            try {
+                $filesystem->mkdir(
+                    Path::normalize($uploadPath),
+                );
+            } catch (IOExceptionInterface $exception) {
+                echo 'An error occurred while creating your directory at ' . $exception->getPath();
+            }
+            $images = "https://api.nasa.gov/EPIC/api/natural/date/{$year}-{$month}-{$day}?api_key={$this->nasaApiKey}";
+            $meta = file_get_contents($images);
+            if ($meta) {
+                $arr = json_decode($meta);
+            } else
+            {
+                $arr = [];
+            }
 
-            $source = $archive . $name;
-            $destination = $this->targetDirectory .'/' . $folder . '/' . $year . '/' . $month . '/' . $day . '/' . $name;
-            copy($source, $destination);
+            foreach ($arr as $item) {
+                $name = $item->image . '.png';
+                $archive = "https://epic.gsfc.nasa.gov/archive/natural/{$year}/{$month}/{$day}/png/";
 
+                $source = $archive . $name;
+                $destination = $this->targetDirectory .
+                    '/' .
+                    $folder .
+                    '/' .
+                    $year .
+                    '/' .
+                    $month .
+                    '/' .
+                    $day .
+                    '/' .
+                    $name;
+                copy($source, $destination);
+            }
         }
     }
 }
