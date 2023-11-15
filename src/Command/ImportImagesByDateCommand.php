@@ -54,6 +54,7 @@ class ImportImagesByDateCommand extends Command
 
     protected function interact(InputInterface $input, OutputInterface $output): void
     {
+
         if ($input->getArgument('folder') !== null) {
             return;
         }
@@ -68,17 +69,11 @@ class ImportImagesByDateCommand extends Command
             'Now we\'ll ask you for the value of all the missing command arguments.',
         ]);
 
-        // Ask for the username if it's not defined
-        $folder = $input->getArgument('folder');
         $folder = $this->io->ask('Folder Name', null, $this->validator->validateFolder(...));
         $input->setArgument('folder', $folder);
 
-        // Ask for the password if it's not defined
-        /** @var string|null $date */
-        $date = $input->getArgument('date');
-
         $date = $this->io->ask(
-            'Date (Example : 2015-18-12)',
+            'Date (Example : 2023-11-13)',
             null,
             $this->validator->validateDate(...)
         );
@@ -108,9 +103,9 @@ class ImportImagesByDateCommand extends Command
         /** @var string $date */
         $date = $input->getArgument('date');
 
-        if ($this->validateAvailableDates($date) === null) {
+        if ($this->validateAvailableDates($date) === null)
             throw new RuntimeException(sprintf('In this date "%s" no image available', $date));
-        }
+
         $this->imageUploader->uploadFromUrlToFolder($folderName, $date);
 
         $this->io->success(

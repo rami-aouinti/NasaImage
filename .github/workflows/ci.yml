@@ -23,8 +23,6 @@ jobs:
               run: make start
             - name: Check running containers
               run: docker ps -a
-            - name: Show framework version and additional info, php & composer version
-              run: make info
             - name: Run test suite
               run: make phpunit
             - name: Archive coverage data for Qodana
