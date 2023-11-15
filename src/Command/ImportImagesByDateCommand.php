@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Command;
 
-use App\Helper\AvailableDatesHelper;
 use App\Service\ImageUploader;
 use App\Utils\Validator;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -15,6 +14,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Stopwatch\Stopwatch;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * Class ImportImagesByDateCommand
@@ -28,12 +28,13 @@ use Symfony\Component\Stopwatch\Stopwatch;
 class ImportImagesByDateCommand extends Command
 {
     final public const NAME = 'nasa:images';
+    final public const URL = 'https://epic.gsfc.nasa.gov/api/images.php?available_dates';
     private SymfonyStyle $io;
 
     public function __construct(
-        private AvailableDatesHelper $availableDatesHelper,
         private ImageUploader $imageUploader,
-        private Validator $validator
+        private Validator $validator,
+        private HttpClientInterface $client
     ) {
         parent::__construct();
     }
@@ -51,10 +52,6 @@ class ImportImagesByDateCommand extends Command
             ->addArgument('date', InputArgument::OPTIONAL, 'The date');
     }
 
-    /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     */
     protected function interact(InputInterface $input, OutputInterface $output): void
     {
         if ($input->getArgument('folder') !== null) {
@@ -98,9 +95,6 @@ class ImportImagesByDateCommand extends Command
     }
 
     /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     * @return int
      * @throws \Exception
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -137,30 +131,22 @@ class ImportImagesByDateCommand extends Command
         return Command::SUCCESS;
     }
 
-    /**
-     * @param string|null $date
-     * @return string|null
-     */
     private function validateAvailableDates(?string $date): ?string
     {
-        $available_dates = $this->availableDatesHelper->getData();
-        if (is_array($available_dates)) {
-            if (count($available_dates) > 0) {
-                if (!is_null($date)) {
-                    if (in_array($date, $available_dates, true)) {
-                        return $date;
-                    }
-                    return null;
+        $available_dates = $this->client->request('GET', self::URL)->toArray();
+        if (count($available_dates) > 0) {
+            if ($date !== null) {
+                if (in_array($date, $available_dates, true)) {
+                    return $date;
                 }
-                return end($available_dates);
-            } else
-            {
+
                 return null;
             }
-        } else
-        {
-            return null;
+
+            return end($available_dates);
         }
+
+        return null;
     }
 
     /**

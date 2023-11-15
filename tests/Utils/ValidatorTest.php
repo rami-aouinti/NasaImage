@@ -1,16 +1,14 @@
-<?php declare(strict_types=1);
+<?php
 
-/**
- * (c) Rami Aouinti <rami.aouinti@gmail.com>
- **/
+declare(strict_types=1);
 
 namespace App\Tests\Utils;
 
-use App\Helper\AvailableDatesHelper;
 use App\Utils\Validator;
 use PHPUnit\Framework\TestCase;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-final class ValidatorTest extends TestCase
+class ValidatorTest extends TestCase
 {
     private Validator $validator;
 
@@ -18,15 +16,14 @@ final class ValidatorTest extends TestCase
 
     protected function setUp(): void
     {
-        $service = $this->getMockBuilder(AvailableDatesHelper::class)
+        $service = $this->getMockBuilder(HttpClientInterface::class)
             ->disableOriginalConstructor()
             ->getMock();
         $this->validator = new Validator($service);
         $availableDates = $this->availableDate();
         if ($availableDates) {
             $this->lastDay = end($availableDates);
-        }
-        else {
+        } else {
             $this->lastDay = '2015-18-12';
         }
     }
@@ -71,17 +68,16 @@ final class ValidatorTest extends TestCase
         $this->validator->validateDate('invalid data');
     }
 
-
     /**
      * @return string[]
      */
     private function availableDate(): array
     {
         return [
-            "2023-11-10",
-            "2023-11-11",
-            "2023-11-12",
-            "2023-11-13"
+            '2023-11-10',
+            '2023-11-11',
+            '2023-11-12',
+            '2023-11-13',
         ];
     }
 }

@@ -9,9 +9,6 @@ use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
 
-/**
- * Class ImageUploader
- */
 class ImageUploader
 {
     public function __construct(
@@ -45,8 +42,7 @@ class ImageUploader
             $meta = file_get_contents($images);
             if ($meta) {
                 $arr = json_decode($meta);
-            } else
-            {
+            } else {
                 $arr = [];
             }
 

@@ -1,13 +1,10 @@
-<?php declare(strict_types=1);
+<?php
 
-/**
- * (c) Rami Aouinti <rami.aouinti@gmail.com>
- **/
+declare(strict_types=1);
 
 namespace App\Tests\Command;
 
 use App\Command\ImportImagesByDateCommand;
-
 
 class ImportImagesByDateCommandTest extends AbstractCommandTest
 {
@@ -61,7 +58,7 @@ class ImportImagesByDateCommandTest extends AbstractCommandTest
 
     private function assertImagesCreated(): void
     {
-        $filename = 'nasa-images/test_folder/2015/11/12/epic_1b_20151112010437.png';
-        $this->assertFalse(file_exists($filename));
+        $filename = './public/nasa-images/test_folder/2015/11/12/epic_1b_20151112010437.png';
+        $this->assertTrue(file_exists($filename));
     }
 }
